@@ -1,5 +1,5 @@
 from .Converters.VolumeToQTConverter import VolumeToQTConverter
-__all__ = ('THRESHOLD1', 'THRESHOLD2', 'THRESHOLD3','V_TO_QT_CONVERTER')
+__all__ = ('THRESHOLD1', 'THRESHOLD2', 'THRESHOLD3', 'V_TO_QT_CONVERTER', 'Q_MAX', 'Q_MIN', 'T_MIN', 'T_MAX')
 
 """"threshold value for stable flooding"""
 THRESHOLD1 = 0.85
@@ -12,3 +12,9 @@ THRESHOLD3 = 0
 
 """default converter for getting QT from volume"""
 V_TO_QT_CONVERTER = VolumeToQTConverter()
+
+"""flooding maps library parameters"""
+Q_MAX = 50
+Q_MIN = 13
+T_MAX = 50
+T_MIN = 1

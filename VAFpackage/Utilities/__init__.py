@@ -1,4 +1,4 @@
 from .MainConstants import *
 from .MainDirectories import *
-from .GRDmap import *
+from .GrdMap import *
 from VAFpackage.Utilities.Converters import *
