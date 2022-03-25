@@ -1,6 +1,8 @@
+import pandas as pd
+from .MainDirectories import RETROSPECTIVE_HYDROGRAPHS_FILEPATH
 
 __all__ = ('THRESHOLD1', 'THRESHOLD2', 'THRESHOLD3', 'Q_MAX', 'Q_MIN', 'T_MIN', 'T_MAX', 'DEFAULT_DECREASE_HEIGHT',
-           'AKHTUBA_ENTRANCE_COORDS')
+           'AKHTUBA_ENTRANCE_COORDS','RETROSPECTIVE_HYDROGRAPHS_TABLE')
 
 """"threshold value for stable flooding"""
 THRESHOLD1 = 0.85
@@ -12,7 +14,7 @@ THRESHOLD2 = 0.1
 THRESHOLD3 = 0
 
 """flooding maps library parameters"""
-Q_MAX = 50
+Q_MAX = 35
 Q_MIN = 13
 T_MAX = 50
 T_MIN = 1
@@ -21,4 +23,7 @@ T_MIN = 1
 DEFAULT_DECREASE_HEIGHT = 0.5
 
 """coordinates for Akhtuba entrance"""
-AKHTUBA_ENTRANCE_COORDS = (788, 340)
+AKHTUBA_ENTRANCE_COORDS = (787, 339)
+
+"""table with retrospective hydrograph parameters"""
+RETROSPECTIVE_HYDROGRAPHS_TABLE = pd.read_excel(RETROSPECTIVE_HYDROGRAPHS_FILEPATH)[['Year', 'Q', 't']]
