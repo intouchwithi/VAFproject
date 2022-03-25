@@ -1,13 +1,14 @@
 import numpy as np
 from ..MainConstants import Q_MAX, Q_MIN, T_MAX, T_MIN
 
-__all__ = ('QTConverter')
+__all__ = ('QTConverter',)
+
 
 class QTConverter:
     def __init__(self):
         pass
 
-    def convert(self, q, t):
+    def convert(self, *, q, t):
         current_q = int(np.round(q/1000, 0))
         current_t = int(np.round(t, 0))
 
