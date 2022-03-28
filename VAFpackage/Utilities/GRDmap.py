@@ -146,7 +146,7 @@ class GrdMap:
 
         return self
 
-    def get_map_unique_values_count(self,*, list_of_excluded_values):
+    def get_map_unique_values_count(self,*, list_of_excluded_values=[]):
         unique_values, counts = np.unique(self._cells, return_counts=True)
         total_count = sum([count for value,count in zip(unique_values, counts) if value not in list_of_excluded_values])
         percents = [np.round(100*count/total_count,4) for value,count in zip(unique_values, counts) if value not in list_of_excluded_values]
