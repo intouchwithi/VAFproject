@@ -1,7 +1,7 @@
 __all__ = ('EconomicAgent',)
 
 class EconomicAgent:
-    def __init__(self, *, function, Smin = 0, Smax = None,eps = 0.01):
+    def __init__(self, *, function, Smin = 0, Smax = None,eps):
         self.S = Smin
         self.SBounds = [(Smin, Smax)]
         self.function = function

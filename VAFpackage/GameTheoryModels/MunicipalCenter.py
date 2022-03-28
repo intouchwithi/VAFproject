@@ -1,7 +1,7 @@
 __all__ = ('MunicipalCenter',)
 
 class MunicipalCenter:
-    def __init__(self, *, function, pmin = 0, pmax = None, eps = 0.01):
+    def __init__(self, *, function, pmin = 0, pmax = None, eps):
         self.p = pmin
         self.pBounds = [(pmin, pmax)]
         self.function = function

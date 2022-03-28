@@ -1,4 +1,4 @@
-from scipy.optimize import basinhopping,minimize
+from scipy.optimize import basinhopping,minimize,brute,fmin
 from functools import partial
 import numpy as np
 
@@ -6,13 +6,13 @@ __all__ = ('TwoLevelModel',)
 
 
 class TwoLevelModel:
-    def __init__(self, *, economic_agent, municipal_center, a, S0, Sf0,k):
+    def __init__(self, *, economic_agent, municipal_center):
         self.economic_agent = economic_agent
-        self.economic_agent.function = partial(self.economic_agent.function, a=a, S0=S0, Sf0=Sf0, k=k)
         self.municipal_center = municipal_center
 
     def _maximize(self, function, bound, eps):
         return minimize(lambda x: -function(x), [0], bounds=bound, tol=eps)
+        #return brute(lambda x: -function(x), (slice(bound[0][0],bound[0][1],eps)), full_output=True, finish=fmin)
 
     def _find_best_S(self, current_p):
         rez = self._maximize(partial(self.economic_agent.function, p=current_p),
@@ -31,7 +31,7 @@ class TwoLevelModel:
                              self.municipal_center.pBounds,
                              self.municipal_center.eps)
         self.municipal_center.p = rez.x[0]
-        self.municipal_center.benefit = -rez.fun[0]
+        self.municipal_center.benefit = -rez.fun
         self.economic_agent.benefit = self.economic_agent.calculate_benefit(S=self.economic_agent.S,
                                                                             p=self.municipal_center.p)
 
