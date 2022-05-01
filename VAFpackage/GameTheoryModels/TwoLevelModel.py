@@ -1,23 +1,31 @@
 from scipy.optimize import basinhopping,minimize,brute,fmin
 from functools import partial
+from . import EconomicAgent, MunicipalCenter, FederalCenter
 import numpy as np
 
 __all__ = ('TwoLevelModel',)
 
 
 class TwoLevelModel:
-    def __init__(self, *, economic_agent, municipal_center):
-        self.economic_agent = economic_agent
-        self.municipal_center = municipal_center
 
-    def _maximize(self, function, bound, eps):
-        return minimize(lambda x: -function(x), [0], bounds=bound, tol=eps)
-        #return brute(lambda x: -function(x), (slice(bound[0][0],bound[0][1],eps)), full_output=True, finish=fmin)
+    def _agent_function(self,S, *, p, a, ecol_function):
+        return a * S * ecol_function(S) - S * p
+
+    def _municipal_function(self,p, *, S):
+        return S * p
+
+    def __init__(self, *, S0, a, ecol_function, step_ea, step_mc):
+        fagent = partial(self._agent_function, a=a, ecol_function=ecol_function)
+        self.economic_agent = EconomicAgent(function=fagent, Smin=0, Smax=S0, step=step_ea)
+        self.municipal_center = MunicipalCenter(function=self._municipal_function, pmin=0, step=step_mc)
+
+    def _maximize(self, function, bound, step):
+        return minimize(lambda x: -function(x), [0], method = 'Nelder-Mead', bounds=bound, tol=step)
 
     def _find_best_S(self, current_p):
         rez = self._maximize(partial(self.economic_agent.function, p=current_p),
                              self.economic_agent.SBounds,
-                             self.economic_agent.eps)
+                             self.economic_agent.step)
         self.economic_agent.S = rez.x[0]
 
     def _find_best_p(self):
@@ -29,7 +37,7 @@ class TwoLevelModel:
 
         rez = self._maximize(_current_municipal_benefit,
                              self.municipal_center.pBounds,
-                             self.municipal_center.eps)
+                             self.municipal_center.step)
         self.municipal_center.p = rez.x[0]
         self.municipal_center.benefit = -rez.fun
         self.economic_agent.benefit = self.economic_agent.calculate_benefit(S=self.economic_agent.S,

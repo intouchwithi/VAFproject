@@ -1,11 +1,11 @@
-from VAFpackage import TwoLevelModel, EconomicAgent, MunicipalCenter
+from VAFpackage import TwoLevelModel, EconomicAgent, MunicipalCenter,ThreeLevelModel,FederalCenter
 import math
 import matplotlib.pyplot as plt
 from functools import partial
 import numpy as np
 
 
-def analytical_Sf_function(*,Sf0,S0,S,degree,curve_down):
+def analytical_Sf_function(S,*,Sf0,S0,degree,curve_down):
     if degree == 0:
         return Sf0
     elif degree == 1:
@@ -18,49 +18,52 @@ def analytical_Sf_function(*,Sf0,S0,S,degree,curve_down):
             temp = math.pow((S0 - S) / S0, degree)
             return Sf0 * temp
 
-
-def Sf_function(*,Sf0,S0,S):
-    return -Sf0*S/S0+Sf0
-
-def fagent(S,*,p,a,Sf0,S0,degree,curve_down):
-    return a*S*analytical_Sf_function(Sf0=Sf0, S0=S0, S=S, degree=degree, curve_down=curve_down)-S*p
-
-def fmunicipal(p,*,S):
-    return S*p
-
 s = []
 p = []
 deg=[]
 Sf=[]
 
-a=4/250
+
 S0=250
 Sf0=100
+a=4/S0
+sigma=0.5
+mu=1
 
+a1=np.arange(-10,0,1)
+a2=np.arange(2,10,1)
+a3=np.concatenate((a1,a2))
+b3=np.concatenate((np.ones(len(a1))*False,np.ones(len(a2))*True))
 
-curve_down = False
-for degree in np.arange(10,0,-1):
-    ea = EconomicAgent(function = fagent,Smin = 0, Smax = S0)
-    ea.function = partial(ea.function, a=a, S0=S0, Sf0=Sf0, degree=degree, curve_down=curve_down)
-    mc = MunicipalCenter(function=fmunicipal, pmin=0)
-    t = TwoLevelModel(economic_agent=ea, municipal_center=mc)
-    t.find_equilibrium()
-    deg.append(-degree)
-    s.append(t.economic_agent.S)
-    p.append(t.municipal_center.p)
-    Sf.append(analytical_Sf_function(S=t.economic_agent.S, S0=S0, Sf0=Sf0, degree=degree, curve_down=curve_down))
-
-curve_down = True
-for degree in np.arange(2,10,1):
-    ea = EconomicAgent(function=fagent, Smin=0, Smax=S0)
-    ea.function = partial(ea.function, a=a, S0=S0, Sf0=Sf0, degree=degree, curve_down=curve_down)
-    mc = MunicipalCenter(function=fmunicipal, pmin=0)
-    t = TwoLevelModel(economic_agent=ea, municipal_center=mc)
+for degree, curve_down in zip(a3, b3):
+    ecol_function = partial(analytical_Sf_function, S0=S0, Sf0=Sf0, degree=abs(degree), curve_down=curve_down)
+    t = TwoLevelModel(S0=S0, a=a, ecol_function=ecol_function, step_ea=1e-6, step_mc=1e-6)
     t.find_equilibrium()
     deg.append(degree)
     s.append(t.economic_agent.S)
     p.append(t.municipal_center.p)
-    Sf.append(analytical_Sf_function(S=t.economic_agent.S, S0=S0, Sf0=Sf0, degree=degree, curve_down=curve_down))
+    Sf.append(ecol_function(S=t.economic_agent.S))
+    if degree==-1:
+        print(t.economic_agent.S, t.municipal_center.p,ecol_function(S=t.economic_agent.S))
 
-plt.plot([i/S0 for i in s],[sf/Sf0 for sf in Sf])
+#s = []
+#p = []
+#deg=[]
+#Sf=[]
+
+
+# for degree, curve_down in zip(a3, b3):
+#     ecol_function = partial(analytical_Sf_function, S0=S0, Sf0=Sf0, degree=abs(degree), curve_down=curve_down)
+#     t = ThreeLevelModel(S0=S0,a=a,sigma=sigma, mu=mu, ecol_function=ecol_function, step_ea=1e-6, step_fc=1e-6, step_mc=1e-3)
+#     t.find_equilibrium()
+#     deg.append(degree)
+#     print(degree)
+#     s.append(t.economic_agent.S)
+#     p.append(t.municipal_center.p)
+#     Sf.append(ecol_function(S=t.economic_agent.S))
+#     if degree==-1:
+#         print(t.economic_agent.S, t.municipal_center.p,ecol_function(S=t.economic_agent.S))
+
+#plt.plot([i/S0 for i in s],[sf/Sf0 for sf in Sf])
+plt.plot(deg,[i/S0 for i in s])
 plt.show()
