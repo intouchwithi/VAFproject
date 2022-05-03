@@ -36,6 +36,14 @@ class GrdMap:
         self.t = None
 
     @property
+    def rows(self):
+        return self._rows
+
+    @property
+    def cols(self):
+        return self._cols
+
+    @property
     def filename(self):
         return self._filename
 
@@ -61,7 +69,7 @@ class GrdMap:
 
     def __getitem__(self, key):
         if type(key) is tuple:
-            return self._cells[(key[0] , key[1])]
+            return self._cells[(key[0], key[1])]
         else:
             raise InvalidType("Write coordinates as tuple")
 
@@ -149,5 +157,5 @@ class GrdMap:
     def get_map_unique_values_count(self,*, list_of_excluded_values=[]):
         unique_values, counts = np.unique(self._cells, return_counts=True)
         total_count = sum([count for value,count in zip(unique_values, counts) if value not in list_of_excluded_values])
-        percents = [np.round(100*count/total_count,4) for value,count in zip(unique_values, counts) if value not in list_of_excluded_values]
+        percents = [np.round(100*count/total_count, 4) for value, count in zip(unique_values, counts) if value not in list_of_excluded_values]
         return unique_values, counts, percents

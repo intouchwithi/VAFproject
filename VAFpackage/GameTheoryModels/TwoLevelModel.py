@@ -1,6 +1,7 @@
 from scipy.optimize import basinhopping,minimize,brute,fmin
 from functools import partial
 from . import EconomicAgent, MunicipalCenter, FederalCenter
+from .CustomMinimizer import customMinimize
 import numpy as np
 
 __all__ = ('TwoLevelModel',)
@@ -20,7 +21,8 @@ class TwoLevelModel:
         self.municipal_center = MunicipalCenter(function=self._municipal_function, pmin=0, step=step_mc)
 
     def _maximize(self, function, bound, step):
-        return minimize(lambda x: -function(x), [0], method = 'Nelder-Mead', bounds=bound, tol=step)
+        #return minimize(lambda x: -function(x), [0], method = 'Nelder-Mead', bounds=bound, tol=step)
+        return customMinimize(function=lambda x: -function(x), bound=bound, step=step)
 
     def _find_best_S(self, current_p):
         rez = self._maximize(partial(self.economic_agent.function, p=current_p),
@@ -32,6 +34,7 @@ class TwoLevelModel:
 
         def _current_municipal_benefit(current_p):
             self._find_best_S(current_p)
+            print(current_p, self.economic_agent.S)
             return self.municipal_center.calculate_benefit(p=current_p,
                                                            S=self.economic_agent.S)
 
@@ -40,6 +43,7 @@ class TwoLevelModel:
                              self.municipal_center.step)
         self.municipal_center.p = rez.x[0]
         self.municipal_center.benefit = -rez.fun
+        self._find_best_S(self.municipal_center.p)
         self.economic_agent.benefit = self.economic_agent.calculate_benefit(S=self.economic_agent.S,
                                                                             p=self.municipal_center.p)
 

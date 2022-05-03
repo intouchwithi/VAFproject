@@ -2,6 +2,7 @@ from scipy.optimize import basinhopping,minimize,brute,fmin
 from functools import partial
 from . import EconomicAgent, MunicipalCenter, FederalCenter
 import numpy as np
+from .CustomMinimizer import customMinimize
 
 __all__ = ('ThreeLevelModel',)
 
@@ -27,6 +28,7 @@ class ThreeLevelModel:
 
     def _maximize(self, function, bound, step):
         return minimize(lambda x: -function(x), [0], method = 'Nelder-Mead', bounds=bound, tol=step)
+        #return customMinimize(function=lambda x: -function(x), bound=bound, step=step)
 
     def _find_best_S(self, current_p):
         rez = self._maximize(partial(self.economic_agent.function, p=current_p),
@@ -47,6 +49,7 @@ class ThreeLevelModel:
                              self.municipal_center.step)
         self.municipal_center.p = rez.x[0]
         self.municipal_center.benefit = -rez.fun
+        self._find_best_S(self.municipal_center.p)
         self.economic_agent.benefit = self.economic_agent.calculate_benefit(S=self.economic_agent.S,
                                                                             p=self.municipal_center.p)
 
@@ -62,6 +65,7 @@ class ThreeLevelModel:
                              self.federal_center.step)
         self.federal_center.lamb = rez.x[0]
         self.federal_center.benefit = -rez.fun
+        self._find_best_p(self.federal_center.lamb)
         self.municipal_center.benefit = self.municipal_center.calculate_benefit(S=self.economic_agent.S,
                                                                                 p=self.municipal_center.p,
                                                                                 lamb=self.federal_center.lamb)
