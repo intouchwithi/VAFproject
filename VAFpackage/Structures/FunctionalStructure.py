@@ -30,7 +30,7 @@ class FunctionalStructure(GrdMap):
 
     def get_relative_area_plot(self):
         values, count, percents = self.get_map_unique_values_count(list_of_excluded_values=[0, -1])
-        figure = plt.figure(figsize=(20, 7))
+        figure = plt.figure(figsize=(25, 5))
         plt.bar([self.legend[value] for value in values], [percent / 100.0 for percent in percents])
         plt.ylabel('Относительная площадь')
         return figure
