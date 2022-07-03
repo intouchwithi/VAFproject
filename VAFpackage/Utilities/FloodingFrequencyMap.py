@@ -1,5 +1,5 @@
-from ..Utilities import GrdMap
-from ..Utilities.MainMaps import ALLOWED_LAND_USAGE_MAP
+from VAFpackage.Utilities import GrdMap
+from VAFpackage.Utilities.MainMaps import ALLOWED_LAND_USAGE_MAP
 import numpy as np
 import numpy.ma as ma
 
